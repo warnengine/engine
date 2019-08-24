@@ -7,9 +7,11 @@ import (
 	"github.com/DeedleFake/Go-PhysicsFS/physfs"
 )
 
+// InitFileSystem attach zip passed as arguments to physfs file system
 func InitFileSystem() {
 	// Init physfs
 	physfs.Init()
+	// Add each zip passed as arguments
 	for index := 1; index <= len(os.Args)-1; index++ {
 		log.Print("adding")
 		log.Print(os.Args[index])
@@ -22,6 +24,7 @@ func InitFileSystem() {
 
 }
 
+// ReadFile gets the content of the file according the given path
 func ReadFile(path string) []byte {
 	file, err := physfs.Open(path)
 	if err != nil {

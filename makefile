@@ -23,4 +23,4 @@ win:
 	@echo Compiling Engine source
 	GOOS=windows GOARCH=amd64 CGO_ENABLED=1 CC=x86_64-w64-mingw32-gcc go build -o build/Warnengine.exe src/*.go
 	@echo Launching app
-	wine build/Warnengine.exe ../Data/public.zip
+	wine build/Warnengine.exe ../data/public.zip

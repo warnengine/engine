@@ -50,7 +50,7 @@ func CreateMesh(obj string) Mesh {
 	return Mesh{vao, int32(len(vertices))}
 }
 
-// DrawMesh draws the triangles composing the mesh
+// Draw draws the triangles composing the mesh
 func (mesh *Mesh) Draw() {
 	// Bind our vertices
 	gl.BindVertexArray(mesh.Vao)

@@ -5,6 +5,7 @@ import (
 	"github.com/go-gl/mathgl/mgl32"
 )
 
+// Hero is model composed by a texture, material, mesh and a transform. Will receive a script component in the future.
 type Hero struct {
 	texture   uint32
 	material  Material
@@ -12,6 +13,7 @@ type Hero struct {
 	transform Transform
 }
 
+// Draw draws the hero according his components
 func (hero *Hero) Draw(bindDiffuse bool) {
 	bias := mgl32.Mat4{
 		0.5, 0.0, 0.0, 0.0,

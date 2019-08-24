@@ -145,7 +145,7 @@ func CreateFont(textureFile string, configFile string, screen Screen) Font {
 	return Font{letters, texture, fontMat}
 }
 
-// DrawString draws a string from a given Font.
+// Draw draws a string from a given Font.
 func (font *Font) Draw (content string, position mgl32.Vec2) {
 	for i, char := range content {
 		// Update position for next letter

@@ -4,6 +4,7 @@ import (
 	"github.com/go-gl/gl/v4.2-core/gl"
 )
 
+// Pipeline regroups diffuse and shadow map and handle the step to render a frame
 type Pipeline struct {
 	quadMat            uint32
 	quadVao            uint32
@@ -13,6 +14,7 @@ type Pipeline struct {
 	ShadowTexture      uint32
 }
 
+// CreatePipeline creates a pipeline (creates and binds opengl textures)
 func CreatePipeline() Pipeline {
 
 	frameBufferDiffuse, diffuseTexture := prepareDiffuse()
@@ -111,7 +113,7 @@ func prepareShadows() (uint32, uint32) {
 	return framebuffer, depthTexture
 }
 
-// BeginDiffuse bind the corresponding target texture and prepare it for rendering
+// BeginDiffuse binds the corresponding target texture and prepare it for rendering
 func (pipeline *Pipeline) BeginDiffuse() {
 	gl.BindFramebuffer(gl.FRAMEBUFFER, pipeline.frameBufferDiffuse)
 	gl.Viewport(0, 0, 1280, 720)
@@ -119,6 +121,7 @@ func (pipeline *Pipeline) BeginDiffuse() {
 	gl.Clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
 }
 
+// EndDiffuse draws the diffuse map on screen
 func (pipeline *Pipeline) EndDiffuse() {
 	gl.BindFramebuffer(gl.FRAMEBUFFER, 0)
 	gl.Viewport(0, 0, 1280, 720)
@@ -131,6 +134,7 @@ func (pipeline *Pipeline) EndDiffuse() {
 	gl.DrawArrays(gl.TRIANGLES, 0, 9)
 }
 
+// BeginShadow binds the shadow map for depth rendering
 func (pipeline *Pipeline) BeginShadow() {
 	gl.BindFramebuffer(gl.FRAMEBUFFER, pipeline.frameBufferShadows)
 	gl.Viewport(0, 0, 2048, 2048)
@@ -138,5 +142,6 @@ func (pipeline *Pipeline) BeginShadow() {
 	gl.Clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
 }
 
+// EndShadow does nothing but it's cool to have an end before a begin isn'it ?
 func (pipeline *Pipeline) EndShadow() {
 }

@@ -5,8 +5,10 @@ import (
 	"github.com/go-gl/mathgl/mgl32"
 )
 
+// KeyCode is a keyboard key represented by an integer
 type KeyCode uint8
 
+// KeyCode is a keyboard key represented by an integer
 const (
 	A KeyCode = iota
 	Z
@@ -17,6 +19,7 @@ const (
 	ESC
 )
 
+// Input allows high level input testing
 type Input struct {
 	window *glfw.Window
 }
