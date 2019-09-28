@@ -10,11 +10,11 @@ Warnengine is working on most linux distro. You just have to install some depend
 
 On fedora platform :
 
-`sudo dnf install glew-devel freetype-devel make gcc-c++ libxcursor-devel libxinerama-devel libxinerama-devel libxrandr-devel`
+`sudo dnf install glew-devel freetype-devel make gcc-c++ libxcursor-devel libxinerama-devel libxinerama-devel libxrandr-devel libXi-devel`
 
 On debian platform :
 
-`sudo apt-get install build-essential libgl1-mesa-dev libxcursor-dev libxinerama-dev libxinerama-dev libxrandr-dev`
+`sudo apt-get install build-essential libgl1-mesa-dev libxcursor-dev libxinerama-dev libxinerama-dev libxrandr-dev libXi-dev`
 
 Fetch the assets :
 
@@ -22,9 +22,9 @@ Next to your `engine` source code folder, clone the warnengine/data repository a
 
 Then you can build it :
 
-`make install-linux`
+`make install-linux` (installs the go dependencies)
 
-`make linux`
+`make linux` (build and run it)
 
 ## Milestones
 
