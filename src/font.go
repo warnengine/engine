@@ -16,9 +16,9 @@ type Screen struct {
 
 // Font contains informations for drawing all letters.
 type Font struct {
-	letters  map[string]Char
-	texture  Texture
-	material Material
+	letters map[string]Char
+	texture Texture
+	program Program
 }
 
 // Char links to a vertex buffer and several font configurations.
@@ -146,16 +146,16 @@ func CreateFont(textureFile string, configFile string, screen Screen) Font {
 }
 
 // Draw draws a string from a given Font.
-func (font *Font) Draw (content string, position mgl32.Vec2) {
+func (font *Font) Draw(content string, position mgl32.Vec2) {
 	for i, char := range content {
 		// Update position for next letter
 		if i != 0 {
 			position = position.Add(mgl32.Vec2{font.letters[string(content[i-1])].advance, 0.0})
 		}
-		UseMaterial(font.material)
+		font.program.Use()
 		gl.ActiveTexture(gl.TEXTURE0)
 		UseTexture(font.texture)
-		UseInputVec2(font.material, position.Sub(mgl32.Vec2{0.0, font.letters[string(char)].top}), "i_position")
+		font.program.UseInputVec2(position.Sub(mgl32.Vec2{0.0, font.letters[string(char)].top}), "i_position")
 		gl.BindVertexArray(font.letters[string(char)].vao)
 		gl.DrawArrays(gl.TRIANGLES, 0, 9)
 	}

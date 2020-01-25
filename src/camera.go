@@ -47,12 +47,6 @@ func UpdateCamPosition(camera Camera, position mgl32.Vec3) Camera {
 	return Camera{camera.projection, view, position, camera.Width, camera.Height, camera.Distance}
 }
 
-// UseCamera tells the rendering API to use this camera.
-func UseCamera(camera Camera, material Material) {
-	UseInputMatrix(material, camera.projection, "projection")
-	UseInputMatrix(material, camera.view, "view")
-}
-
 // Callback when the user use the scroll button.
 func scrollCameraCb(window *glfw.Window, xoffset float64, yoffset float64) {
 	distance := (*Camera)(window.GetUserPointer()).Distance

@@ -6,7 +6,7 @@ import (
 
 // Pipeline regroups diffuse and shadow map and handle the step to render a frame
 type Pipeline struct {
-	quadMat            uint32
+	quadMat            Program
 	quadVao            uint32
 	frameBufferDiffuse uint32
 	frameBufferShadows uint32
@@ -116,7 +116,7 @@ func prepareShadows() (uint32, uint32) {
 // BeginDiffuse binds the corresponding target texture and prepare it for rendering
 func (pipeline *Pipeline) BeginDiffuse() {
 	gl.BindFramebuffer(gl.FRAMEBUFFER, pipeline.frameBufferDiffuse)
-	gl.Viewport(0, 0, 1280, 720)
+	gl.Viewport(0, 0, int32(pipeline.screen.Width), int32(pipeline.screen.Height))
 
 	gl.Clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
 }
@@ -127,7 +127,7 @@ func (pipeline *Pipeline) EndDiffuse() {
 	gl.Viewport(0, 0, int32(pipeline.screen.Width), int32(pipeline.screen.Height))
 	gl.Clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
 
-	UseMaterial(pipeline.quadMat)
+	pipeline.quadMat.Use()
 	gl.ActiveTexture(gl.TEXTURE0)
 	UseTexture(pipeline.DiffuseTexture)
 	gl.BindVertexArray(pipeline.quadVao)

@@ -25,7 +25,7 @@ func main() {
 	// Increment each new frame
 	var frame int
 
-	screen := Screen{1280, 720}
+	screen := Screen{640, 640}
 	display := createDisplay(screen)
 
 	log.Println("Hello from OpenGL")
@@ -65,8 +65,8 @@ func main() {
 	// Prepare our transform that will describe position/rotatigeometric intersection testingon/scale of our object
 	theMapTransform := CreateTransform(mgl32.Vec3{0.0, 0.0, 0.0}, mgl32.Vec3{0.0, 0.0, 0.0}, mgl32.Vec3{1.0, 1.0, 1.0})
 	// Link it to our shadergeometric intersection testing
-	UseMaterial(mat)
-	UseInputMatrix(mat, cubeTransform.Model, "model")
+	mat.Use()
+	mat.UseInputMatrix(cubeTransform.Model, "model")
 
 	now := time.Now().UnixNano()
 
@@ -100,13 +100,13 @@ func main() {
 		gl.Clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
 
 		camera = UpdateCamera(camera, display.window)
-		UseMaterial(mat)
-		UseCamera(camera, mat)
+		mat.Use()
+		mat.UseCamera(camera)
 		// ========================
 		// DIFFUSE
 		// ========================
 		// Bind shader
-		UseMaterial(mat)
+		mat.Use()
 		// CUBE
 		// Bind texture
 		gl.ActiveTexture(gl.TEXTURE0)
@@ -115,11 +115,11 @@ func main() {
 		gl.ActiveTexture(gl.TEXTURE1)
 		UseTexture(pipeline.ShadowTexture)
 		// Bind model view
-		UseInputMatrix(mat, cubeTransform.Model, "model")
-		UseInputMatrix(mat, bias, "bias")
-		UseInputInt(mat, 0, "castShadow")
+		mat.UseInputMatrix(cubeTransform.Model, "model")
+		mat.UseInputMatrix(bias, "bias")
+		mat.UseInputInt(0, "castShadow")
 		// Bind our light
-		light.Use(mat, false)
+		mat.UseLight(light, false)
 		// Draw our cube mesh
 		cube.Draw()
 		// MAP
@@ -130,11 +130,11 @@ func main() {
 		gl.ActiveTexture(gl.TEXTURE1)
 		UseTexture(pipeline.ShadowTexture)
 		// Bind model view
-		UseInputMatrix(mat, theMapTransform.Model, "model")
-		UseInputMatrix(mat, bias, "bias")
-		UseInputInt(mat, 1, "castShadow")
+		mat.UseInputMatrix(theMapTransform.Model, "model")
+		mat.UseInputMatrix(bias, "bias")
+		mat.UseInputInt(1, "castShadow")
 		// Bind our light
-		light.Use(mat, false)
+		mat.UseLight(light, false)
 		// Draw our cube mesh
 		theMap.Draw()
 		font.Draw(fmt.Sprintf("%d", int32(math.Ceil(1/timePerFrame)))+" fps", mgl32.Vec2{0.0, 0.0})
@@ -143,9 +143,9 @@ func main() {
 		// SHADOWS
 		// ========================
 		pipeline.BeginShadow()
-		UseMaterial(shadowMat)
-		light.Use(shadowMat, true)
-		UseInputMatrix(shadowMat, cubeTransform.Model, "model")
+		shadowMat.Use()
+		shadowMat.UseLight(light, true)
+		shadowMat.UseInputMatrix(cubeTransform.Model, "model")
 		cube.Draw()
 		/*UseInputMatrix(shadowMat, theMapTransform.Model, "model")
 		DrawMesh(theMap)*/

@@ -19,13 +19,13 @@ func CreateLight(position mgl32.Vec3) Light {
 	return Light{depthProjectionMatrix, depthViewMatrix, position}
 }
 
-// Use binds the current light to the shader
-func (light *Light) Use(material Material, shadowPass bool) {
+// UseLight binds the current light to the shader
+func (program *Program) UseLight(light Light, shadowPass bool) {
 	if shadowPass {
-		UseInputMatrix(material, light.projection, "projection")
-		UseInputMatrix(material, light.view, "view")
+		program.UseInputMatrix(light.projection, "projection")
+		program.UseInputMatrix(light.view, "view")
 	} else {
-		UseInputMatrix(material, light.projection, "lightProjection")
-		UseInputMatrix(material, light.view, "lightView")
+		program.UseInputMatrix(light.projection, "lightProjection")
+		program.UseInputMatrix(light.view, "lightView")
 	}
 }

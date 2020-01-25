@@ -8,11 +8,13 @@ import (
 	"github.com/go-gl/mathgl/mgl32"
 )
 
-// Material stores settings and shaders to draw 3D object.
-type Material = uint32
+// Program stores settings and shaders to draw 3D object.
+type Program struct {
+	glProgram uint32
+}
 
 // CreateMaterial loads and compiles shaders and returns the prepared Material/
-func CreateMaterial(vertexShaderPath string, fragmentShaderPath string) Material {
+func CreateMaterial(vertexShaderPath string, fragmentShaderPath string) Program {
 	// Load source code of the vertex shader
 	vertexShaderSource := ReadFile(vertexShaderPath)
 	// Compile the vertex shader
@@ -33,40 +35,46 @@ func CreateMaterial(vertexShaderPath string, fragmentShaderPath string) Material
 	gl.AttachShader(prog, fragmentShader)
 	gl.LinkProgram(prog)
 
-	return prog
+	return Program{prog}
 }
 
-// UseMaterial tells the rendering API to use a specific material (shaders by-the-way).
-func UseMaterial(material Material) {
-	gl.UseProgram(material)
+// Use tells the rendering API to use a specific material (shaders by-the-way).
+func (program *Program) Use() {
+	gl.UseProgram(program.glProgram)
 }
 
 // UseInputMatrix links a 4x4 matrix to the material
-func UseInputMatrix(material Material, matrix mgl32.Mat4, inputName string) {
-	inputID := gl.GetUniformLocation(material, gl.Str(inputName+"\x00"))
+func (program *Program) UseInputMatrix(matrix mgl32.Mat4, inputName string) {
+	inputID := gl.GetUniformLocation(program.glProgram, gl.Str(inputName+"\x00"))
 	checkInputID(inputID, inputName)
 	gl.UniformMatrix4fv(inputID, 1, false, &matrix[0])
 }
 
 // UseInputVec3 links a vec3 to the material
-func UseInputVec3(mat Material, vec mgl32.Vec3, inputName string) {
-	inputID := gl.GetUniformLocation(mat, gl.Str(inputName+"\x00"))
+func (program *Program) UseInputVec3(vec mgl32.Vec3, inputName string) {
+	inputID := gl.GetUniformLocation(program.glProgram, gl.Str(inputName+"\x00"))
 	checkInputID(inputID, inputName)
 	gl.Uniform3fv(inputID, 1, &vec[0])
 }
 
 // UseInputVec2 links a vec2 to the material
-func UseInputVec2(mat Material, vec mgl32.Vec2, inputName string) {
-	inputID := gl.GetUniformLocation(mat, gl.Str(inputName+"\x00"))
+func (program *Program) UseInputVec2(vec mgl32.Vec2, inputName string) {
+	inputID := gl.GetUniformLocation(program.glProgram, gl.Str(inputName+"\x00"))
 	checkInputID(inputID, inputName)
 	gl.Uniform2fv(inputID, 1, &vec[0])
 }
 
 // UseInputInt links an integer to the material
-func UseInputInt(mat Material, vec int32, inputName string) {
-	inputID := gl.GetUniformLocation(mat, gl.Str(inputName+"\x00"))
+func (program *Program) UseInputInt(vec int32, inputName string) {
+	inputID := gl.GetUniformLocation(program.glProgram, gl.Str(inputName+"\x00"))
 	checkInputID(inputID, inputName)
 	gl.Uniform1i(inputID, vec)
+}
+
+// UseCamera tells the rendering API to use a camera.
+func (program *Program) UseCamera(camera Camera) {
+	program.UseInputMatrix(camera.projection, "projection")
+	program.UseInputMatrix(camera.view, "view")
 }
 
 func checkInputID(inputID int32, inputName string) {
