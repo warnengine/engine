@@ -7,6 +7,7 @@ import (
 	"github.com/go-gl/glfw/v3.2/glfw"
 )
 
+// Display manages the window of the game
 type Display struct {
 	window *glfw.Window
 }
@@ -18,8 +19,12 @@ func createDisplay(screen Screen) Display {
 		panic(err)
 	}
 
-	// Specifiy sizes of the screen
+	// Some window hint
 	glfw.WindowHint(glfw.Resizable, glfw.False)
+	glfw.WindowHint(glfw.Samples, 4)
+	glfw.WindowHint(glfw.ContextVersionMajor, 4)
+	glfw.WindowHint(glfw.ContextVersionMinor, 2)
+	glfw.WindowHint(glfw.OpenGLProfile, glfw.OpenGLCoreProfile)
 
 	// Create window
 	window, err := glfw.CreateWindow(screen.Width, screen.Height, "Warnengine", nil, nil)
@@ -27,10 +32,6 @@ func createDisplay(screen Screen) Display {
 		panic(err)
 	}
 
-	glfw.WindowHint(glfw.Samples, 4)
-	glfw.WindowHint(glfw.ContextVersionMajor, 4)
-	glfw.WindowHint(glfw.ContextVersionMinor, 2)
-	glfw.WindowHint(glfw.OpenGLProfile, glfw.OpenGLCoreProfile)
 	window.MakeContextCurrent()
 	if err := gl.Init(); err != nil {
 		log.Fatalln(err)
@@ -43,8 +44,9 @@ func createDisplay(screen Screen) Display {
 	gl.Enable(gl.DEPTH_TEST)
 	gl.Enable(gl.BLEND)
 	gl.BlendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA)
-	gl.CullFace(gl.BACK)
+	// gl.CullFace(gl.BACK)
 	gl.Disable(gl.CULL_FACE)
+	gl.Enable(gl.MULTISAMPLE)
 
 	return Display{
 		window: window,

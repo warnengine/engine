@@ -25,7 +25,7 @@ func main() {
 	// Increment each new frame
 	var frame int
 
-	screen := Screen{640, 640}
+	screen := Screen{1280, 720}
 	display := createDisplay(screen)
 
 	log.Println("Hello from OpenGL")

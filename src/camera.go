@@ -50,11 +50,11 @@ func UpdateCamPosition(camera Camera, position mgl32.Vec3) Camera {
 // Callback when the user use the scroll button.
 func scrollCameraCb(window *glfw.Window, xoffset float64, yoffset float64) {
 	distance := (*Camera)(window.GetUserPointer()).Distance
-	/* 	if distance < 31 && distance > -2 {
-	if (distance+0.2*yoffset) < 30 && (distance+0.2*yoffset) > -1 {*/
-	(*Camera)(window.GetUserPointer()).Distance += 0.25 * yoffset
-	/*}
-	} */
+	if distance < 31 && distance > -2 {
+		if (distance+0.2*yoffset) < 30 && (distance+0.2*yoffset) > -1 {
+			(*Camera)(window.GetUserPointer()).Distance += 0.25 * yoffset
+		}
+	}
 	distance = (*Camera)(window.GetUserPointer()).Distance
 	position := (*Camera)(window.GetUserPointer()).Position
 	(*Camera)(window.GetUserPointer()).view = mgl32.LookAtV(mgl32.Vec3{3 + float32(distance), 3 + float32(distance), 3 + float32(distance)}.Add(position), mgl32.Vec3{0, 0, 0}.Add(position), mgl32.Vec3{0, 1, 0})
