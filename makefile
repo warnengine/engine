@@ -6,13 +6,8 @@ install-linux:
 	go get github.com/DeedleFake/Go-PhysicsFS/physfs
 	go get github.com/go-gl/glfw/v3.2/glfw
 	go get github.com/go-gl/gl/v3.3-core/gl
-
-purge:
-	rm -rf src/github.com/
-	rm -rf src/golang.org/
-	rm -rf vendor/
-	exit
-
+	go get github.com/sheenobu/go-obj/obj
+	
 linux:
 	@echo Compiling Engine source
 	GOARCH=amd64 go build -o build/Warnengine src/*.go

@@ -10,7 +10,7 @@ Warnengine is working on most linux distro. You just have to install some depend
 
 On fedora platform :
 
-`sudo dnf install glew-devel freetype-devel make gcc-c++ libxcursor-devel libxinerama-devel libxinerama-devel libxrandr-devel`
+`sudo dnf install glew-devel freetype-devel make gcc-c++ libXcursor-devel libXinerama-devel libXinerama-devel libXrandr-devel`
 
 On debian platform :
 

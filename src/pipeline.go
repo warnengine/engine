@@ -12,15 +12,15 @@ type Pipeline struct {
 	frameBufferShadows uint32
 	DiffuseTexture     uint32
 	ShadowTexture      uint32
+	screen             Screen
 }
 
 // CreatePipeline creates a pipeline (creates and binds opengl textures)
-func CreatePipeline() Pipeline {
+func CreatePipeline(screen Screen) Pipeline {
 
-	frameBufferDiffuse, diffuseTexture := prepareDiffuse()
+	frameBufferDiffuse, diffuseTexture := prepareDiffuse(screen)
 	frameBufferShadows, depthTexture := prepareShadows()
 	// RECT TO FIT THE SCREEN
-
 	quadVertices := []float32{
 		0.0, 0.0,
 		0.0, -2.0,
@@ -64,11 +64,11 @@ func CreatePipeline() Pipeline {
 
 	quadMat := CreateMaterial("Shaders/sprite.vs.glsl", "Shaders/sprite.fs.glsl")
 
-	return Pipeline{quadMat, vao, frameBufferDiffuse, frameBufferShadows, diffuseTexture, depthTexture}
+	return Pipeline{quadMat, vao, frameBufferDiffuse, frameBufferShadows, diffuseTexture, depthTexture, screen}
 
 }
 
-func prepareDiffuse() (uint32, uint32) {
+func prepareDiffuse(screen Screen) (uint32, uint32) {
 	var framebuffer uint32
 	gl.GenFramebuffers(1, &framebuffer)
 	gl.BindFramebuffer(gl.FRAMEBUFFER, framebuffer)
@@ -76,14 +76,14 @@ func prepareDiffuse() (uint32, uint32) {
 	var renderedTexture uint32
 	gl.GenTextures(1, &renderedTexture)
 	gl.BindTexture(gl.TEXTURE_2D, renderedTexture)
-	gl.TexImage2D(gl.TEXTURE_2D, 0, gl.RGB, 1280, 720, 0, gl.RGB, gl.UNSIGNED_BYTE, nil)
+	gl.TexImage2D(gl.TEXTURE_2D, 0, gl.RGB, int32(screen.Width), int32(screen.Height), 0, gl.RGB, gl.UNSIGNED_BYTE, nil)
 	gl.TexParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST)
 	gl.TexParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST)
 
 	var depthrenderbuffer uint32
 	gl.GenRenderbuffers(1, &depthrenderbuffer)
 	gl.BindRenderbuffer(gl.RENDERBUFFER, depthrenderbuffer)
-	gl.RenderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT, 1280, 720)
+	gl.RenderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT, int32(screen.Width), int32(screen.Height))
 	gl.FramebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, depthrenderbuffer)
 
 	gl.FramebufferTexture(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, renderedTexture, 0)
@@ -124,7 +124,7 @@ func (pipeline *Pipeline) BeginDiffuse() {
 // EndDiffuse draws the diffuse map on screen
 func (pipeline *Pipeline) EndDiffuse() {
 	gl.BindFramebuffer(gl.FRAMEBUFFER, 0)
-	gl.Viewport(0, 0, 1280, 720)
+	gl.Viewport(0, 0, int32(pipeline.screen.Width), int32(pipeline.screen.Height))
 	gl.Clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
 
 	UseMaterial(pipeline.quadMat)
