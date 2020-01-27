@@ -17,6 +17,8 @@ func init() {
 	runtime.LockOSThread()
 }
 
+var dejaVuSans Font
+
 func main() {
 	// Init our file system
 	InitFileSystem()
@@ -35,8 +37,11 @@ func main() {
 	pipeline := CreatePipeline(screen)
 
 	// HERE STARTS THE GOOD STUFF
-	font := CreateFont("Fonts/DejaVuSans.png", "Fonts/DejaVuSans.fnt", screen)
-	_ = font
+	dejaVuSans := CreateFont("Fonts/DejaVuSans.png", "Fonts/DejaVuSans.fnt", 64, screen)
+
+	// Basic form for testing purpose
+	form := CreateForm(display.window, dejaVuSans, screen)
+	form.AddButton(CreateDefaultButton("CLICK ME", mgl32.Vec2{1, -1}))
 
 	camera := CreateCamera(mgl32.Vec3{0, 3, 0}, display.window, int32(screen.Width), int32(screen.Height))
 	display.window.SetUserPointer(unsafe.Pointer(&camera))
@@ -135,9 +140,11 @@ func main() {
 		mat.UseInputInt(1, "castShadow")
 		// Bind our light
 		mat.UseLight(light, false)
-		// Draw our cube mesh
 		theMap.Draw()
-		font.Draw(fmt.Sprintf("%d", int32(math.Ceil(1/timePerFrame)))+" fps", mgl32.Vec2{0.0, 0.0})
+		// A bit of text rendering
+		dejaVuSans.Draw(fmt.Sprintf("%d", int32(math.Ceil(1/timePerFrame)))+"fps", Color{0.2, 0.8, 0.2}, mgl32.Vec2{0.0, 0.0})
+		form.Draw()
+		// End for color rendering
 		pipeline.EndDiffuse()
 		// ========================
 		// SHADOWS

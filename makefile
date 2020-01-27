@@ -9,6 +9,8 @@ install-linux:
 	go get github.com/sheenobu/go-obj/obj
 	
 linux:
+	@echo Compiling Engine data
+	cd ../Data && zip -r -q public.zip *
 	@echo Compiling Engine source
 	GOARCH=amd64 go build -o build/Warnengine src/*.go
 	@echo Launching app

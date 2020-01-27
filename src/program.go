@@ -41,6 +41,10 @@ func CreateMaterial(vertexShaderPath string, fragmentShaderPath string) Program 
 // Use tells the rendering API to use a specific material (shaders by-the-way).
 func (program *Program) Use() {
 	gl.UseProgram(program.glProgram)
+	err := gl.GetError()
+	if err != 0 {
+		panic(fmt.Sprintf("OpenGL error in glUseProgram : %d", err))
+	}
 }
 
 // UseInputMatrix links a 4x4 matrix to the material

@@ -41,6 +41,7 @@ Then you can build it :
         * [x] Directional light
         * [x] Ambient light
         * [x] Shadow mapping
+        * [ ] Terrain from texture
     * Sound
         * [ ] Play music
         * [ ] Play 3D sound
@@ -49,10 +50,9 @@ Then you can build it :
         * [x] Reading from multiple zip
         * [x] Overwrite assets by adding zip
     * UI
-        * [x] Draw text
-        * [ ] Button
-        * [ ] Input text
-        * [ ] Check box
+        * [x] Simple text
+        * [x] Form group
+        * [ ] Button (current work)
 
 ## Improvements
 

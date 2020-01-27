@@ -16,21 +16,21 @@ type Screen struct {
 
 // Font contains informations for drawing all letters.
 type Font struct {
-	letters map[string]Char
-	texture Texture
-	program Program
+	letters  map[string]Char
+	texture  Texture
+	program  Program
+	fontSize int
 }
 
 // Char links to a vertex buffer and several font configurations.
 type Char struct {
 	vao     uint32
 	advance float32
-	top     float32
 	uvs     []float32
 }
 
 // CreateFont loads from settings files all textures and informations to draw letters/
-func CreateFont(textureFile string, configFile string, screen Screen) Font {
+func CreateFont(textureFile string, configFile string, size int, screen Screen) Font {
 	// Load texture
 	texture, textSizeX, textSizeY := CreateTexture(textureFile)
 	// Load shader
@@ -43,6 +43,13 @@ func CreateFont(textureFile string, configFile string, screen Screen) Font {
 	var v interface{}
 	json.Unmarshal(jsonData, &v)
 	data := v.(map[string]interface{})["chars"].(map[string]interface{})["char"].([]interface{})
+	// Get font size
+	fontSize, err := strconv.Atoi(v.(map[string]interface{})["info"].(map[string]interface{})["@size"].(string))
+	// Get desired scale
+	scale := 1.0 / float32(fontSize) * float32(size)
+	if err != nil {
+		panic(err)
+	}
 	// Loop over char data
 	for _, element := range data {
 		current := element.(map[string]interface{})
@@ -56,11 +63,6 @@ func CreateFont(textureFile string, configFile string, screen Screen) Font {
 			panic(err)
 		}
 		advance, err := strconv.Atoi(current["@xadvance"].(string))
-		if err != nil {
-			panic(err)
-		}
-		top, err := strconv.Atoi(current["@yoffset"].(string))
-		_ = top
 		if err != nil {
 			panic(err)
 		}
@@ -84,16 +86,18 @@ func CreateFont(textureFile string, configFile string, screen Screen) Font {
 		}
 		// According to width/height of the screen
 		// Compute OpenGL coordinates
-		realWidth := (1 / float32(screen.Width)) * float32(width)
-		realHeight := (1 / float32(screen.Height)) * float32(height)
+		realWidth := (1 / float32(screen.Width)) * float32(width) * scale
+		realHeight := (1 / float32(screen.Height)) * float32(height) * scale
+		realYOffset := ((1 / float32(screen.Height)) * float32(yOffset)) * scale
+		realXOffset := ((1 / float32(screen.Width)) * float32(xOffset)) / 2 * scale
 		vertices := []float32{
-			0.0, 0.0,
-			0.0, -realHeight,
-			realWidth, 0.0,
+			realXOffset, -realYOffset,
+			realXOffset, -realHeight - realYOffset,
+			realWidth + realXOffset, -realYOffset,
 
-			0.0, -realHeight,
-			realWidth, -realHeight,
-			realWidth, 0.0}
+			realXOffset, -realHeight - realYOffset,
+			realWidth + realXOffset, -realHeight - realYOffset,
+			realWidth + realXOffset, -realYOffset}
 
 		realUvX := (1 / float32(textSizeX)) * float32(uvX)
 		realUvY := (1 / float32(textSizeY)) * float32(textSizeY-uvY)
@@ -101,8 +105,8 @@ func CreateFont(textureFile string, configFile string, screen Screen) Font {
 		realWidth = (1 / float32(textSizeX)) * float32(width)
 		realHeight = (1 / float32(textSizeY)) * float32(height)
 
-		realAdvance := (1 / float32(screen.Width)) * float32(advance)
-		realTop := (1 / float32(screen.Width)) * float32(64-height)
+		realAdvance := (1 / float32(screen.Width)) * float32(advance) * scale
+		// realTop := (1 / float32(screen.Width)) * float32(fontSize-height)
 
 		uvs := []float32{
 			realUvX, realUvY,
@@ -140,22 +144,32 @@ func CreateFont(textureFile string, configFile string, screen Screen) Font {
 		if err != nil {
 			panic(err)
 		}
-		letters[string(asciiCode)] = Char{vao, realAdvance, realTop, uvs}
+		letters[string(asciiCode)] = Char{vao, realAdvance, uvs}
 	}
-	return Font{letters, texture, fontMat}
+	return Font{letters, texture, fontMat, fontSize}
+}
+
+// GetTextSize computes the width of a given text
+func (font *Font) GetTextSize(content string) float32 {
+	var size float32
+	for i := range content {
+		size += font.letters[string(content[i])].advance
+	}
+	return size
 }
 
 // Draw draws a string from a given Font.
-func (font *Font) Draw(content string, position mgl32.Vec2) {
+func (font *Font) Draw(content string, color Color, position mgl32.Vec2) {
 	for i, char := range content {
 		// Update position for next letter
 		if i != 0 {
 			position = position.Add(mgl32.Vec2{font.letters[string(content[i-1])].advance, 0.0})
 		}
 		font.program.Use()
+		font.program.UseInputVec3(mgl32.Vec3{color.red, color.green, color.blue}, "i_color")
 		gl.ActiveTexture(gl.TEXTURE0)
 		UseTexture(font.texture)
-		font.program.UseInputVec2(position.Sub(mgl32.Vec2{0.0, font.letters[string(char)].top}), "i_position")
+		font.program.UseInputVec2(position, "i_position")
 		gl.BindVertexArray(font.letters[string(char)].vao)
 		gl.DrawArrays(gl.TRIANGLES, 0, 9)
 	}
