@@ -1,12 +1,13 @@
 package main
 
 import (
-	"github.com/go-gl/gl/v3.3-core/gl"
+	"github.com/go-gl/gl/v4.2-core/gl"
 )
 
 // Pipeline regroups diffuse and shadow map and handle the step to render a frame
 type Pipeline struct {
 	quadMat            Program
+	shadowMat          Program
 	quadVao            uint32
 	frameBufferDiffuse uint32
 	frameBufferShadows uint32
@@ -62,9 +63,10 @@ func CreatePipeline(screen Screen) Pipeline {
 	gl.BindBuffer(gl.ARRAY_BUFFER, uvsBuffer)
 	gl.VertexAttribPointer(1, 2, gl.FLOAT, false, 0, nil)
 
-	quadMat := CreateMaterial("Shaders/sprite.vs.glsl", "Shaders/sprite.fs.glsl")
+	quadMat := CreateProgram("Shaders/sprite.vs.glsl", "Shaders/sprite.fs.glsl")
+	shadowMat := CreateProgram("Shaders/shadows.vs.glsl", "Shaders/shadows.fs.glsl")
 
-	return Pipeline{quadMat, vao, frameBufferDiffuse, frameBufferShadows, diffuseTexture, depthTexture, screen}
+	return Pipeline{quadMat, shadowMat, vao, frameBufferDiffuse, frameBufferShadows, diffuseTexture, depthTexture, screen}
 
 }
 
@@ -143,6 +145,8 @@ func (pipeline *Pipeline) BeginShadow() {
 
 	gl.Clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
 	gl.CullFace(gl.FRONT)
+
+	pipeline.shadowMat.Use()
 }
 
 // EndShadow does nothing but it's cool to have an end before a begin isn'it ?

@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/go-gl/gl/v3.3-core/gl"
+	"github.com/go-gl/gl/v4.2-core/gl"
 	"github.com/go-gl/mathgl/mgl32"
 )
 
@@ -14,7 +14,7 @@ type Program struct {
 }
 
 // CreateMaterial loads and compiles shaders and returns the prepared Material/
-func CreateMaterial(vertexShaderPath string, fragmentShaderPath string) Program {
+func CreateProgram(vertexShaderPath string, fragmentShaderPath string) Program {
 	// Load source code of the vertex shader
 	vertexShaderSource := ReadFile(vertexShaderPath)
 	// Compile the vertex shader
@@ -34,7 +34,6 @@ func CreateMaterial(vertexShaderPath string, fragmentShaderPath string) Program 
 	gl.AttachShader(prog, vertexShader)
 	gl.AttachShader(prog, fragmentShader)
 	gl.LinkProgram(prog)
-	
 
 	return Program{prog}
 }
@@ -42,7 +41,7 @@ func CreateMaterial(vertexShaderPath string, fragmentShaderPath string) Program 
 // Use tells the rendering API to use a specific material (shaders by-the-way).
 func (program *Program) Use() {
 	gl.UseProgram(program.glProgram)
-	
+
 }
 
 // UseInputMatrix links a 4x4 matrix to the material
@@ -57,7 +56,7 @@ func (program *Program) UseInputVec3(vec mgl32.Vec3, inputName string) {
 	inputID := gl.GetUniformLocation(program.glProgram, gl.Str(inputName+"\x00"))
 	checkInputID(inputID, inputName)
 	gl.Uniform3fv(inputID, 1, &vec[0])
-	
+
 }
 
 // UseInputVec2 links a vec2 to the material
@@ -65,7 +64,7 @@ func (program *Program) UseInputVec2(vec mgl32.Vec2, inputName string) {
 	inputID := gl.GetUniformLocation(program.glProgram, gl.Str(inputName+"\x00"))
 	checkInputID(inputID, inputName)
 	gl.Uniform2fv(inputID, 1, &vec[0])
-	
+
 }
 
 // UseInputInt links an integer to the material
@@ -73,7 +72,7 @@ func (program *Program) UseInputInt(vec int32, inputName string) {
 	inputID := gl.GetUniformLocation(program.glProgram, gl.Str(inputName+"\x00"))
 	checkInputID(inputID, inputName)
 	gl.Uniform1i(inputID, vec)
-	
+
 }
 
 // UseCamera tells the rendering API to use a camera.

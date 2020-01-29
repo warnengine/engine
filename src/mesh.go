@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/go-gl/gl/v3.3-core/gl"
+	"github.com/go-gl/gl/v4.2-core/gl"
 )
 
 // Mesh represent a vertex buffer and has a specific length

@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"strconv"
 
-	"github.com/go-gl/gl/v3.3-core/gl"
+	"github.com/go-gl/gl/v4.2-core/gl"
 	"github.com/go-gl/mathgl/mgl32"
 )
 
@@ -34,7 +34,7 @@ func CreateFont(textureFile string, configFile string, size int, screen Screen) 
 	// Load texture
 	texture, textSizeX, textSizeY := CreateTexture(textureFile)
 	// Load shader
-	fontMat := CreateMaterial("Shaders/font.vs.glsl", "Shaders/font.fs.glsl")
+	fontMat := CreateProgram("Shaders/font.vs.glsl", "Shaders/font.fs.glsl")
 	// Where we will store vao's letters
 	letters := make(map[string]Char)
 	// Read json

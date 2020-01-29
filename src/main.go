@@ -8,7 +8,7 @@ import (
 	"time"
 	"unsafe"
 
-	"github.com/go-gl/gl/v3.3-core/gl"
+	"github.com/go-gl/gl/v4.2-core/gl"
 	"github.com/go-gl/glfw/v3.2/glfw"
 	"github.com/go-gl/mathgl/mgl32"
 )
@@ -47,49 +47,16 @@ func main() {
 	camera := CreateCamera(mgl32.Vec3{0, 3, 0}, display.window, int32(screen.Width), int32(screen.Height))
 	display.window.SetUserPointer(unsafe.Pointer(&camera))
 	/*========================
-	Shaders
+	Monkey
 	========================*/
-	// Load and compile our shaders
-	mat := CreateMaterial("Shaders/basic.vs.glsl", "Shaders/basic.fs.glsl")
+	monkey := CreateModel("Meshes/monkey.obj", "Textures/abstract.jpg", "Shaders/basic")
 	/*========================
-	Cube
+	Sphere
 	========================*/
-	// Init our 3D model "Cube"
-	cube := CreateMesh("Meshes/monkey.obj")
-	_ = cube
-	// Load our texture
-	cubeTexture, _, _ := CreateTexture("Textures/abstract.jpg")
-	_ = cubeTexture
-	// Prepare our transform that will describe position/rotation/scale of our object
-	cubeTransform := CreateTransform(mgl32.Vec3{0.0, 1.0, 0.0}, mgl32.Vec3{0.0, 0.0, 0.0}, mgl32.Vec3{1.0, 1.0, 1.0})
-	// /*========================
-	// theMap
-	// ========================*/
-	// // Init our 3D model "Cube"
-	// theMap := CreateMesh("Meshes/map.obj")
-	// _ = cube
-	// // Load our texture
-	// theMapTexture, _, _ := CreateTexture("Textures/map.png")
-	// _ = theMapTexture
-	// // Prepare our transform that will describe position/rotatigeometric intersection testingon/scale of our object
-	// theMapTransform := CreateTransform(mgl32.Vec3{0.0, -1.0, 0.0}, mgl32.Vec3{0.0, 0.0, 0.0}, mgl32.Vec3{1.0, 1.0, 1.0})
-	// // Link it to our shadergeometric intersection testing
-	// mat.Use()
-	// mat.UseInputMatrix(cubeTransform.Model, "model")
-	/*========================
-	sphere
-	========================*/
-	// Init our 3D model "sphere"
-	sphere := CreateMesh("Meshes/sphere.obj")
-	// Load our texture
-	sphereTexture, _, _ := CreateTexture("Textures/terrain.jpg")
-	// Prepare our transform that will describe position/rotation/scale of our object
-	sphereTransform := CreateTransform(mgl32.Vec3{0.5, 3.0, -3.0}, mgl32.Vec3{0.0, 0.0, 0.0}, mgl32.Vec3{1.0, 1.0, 1.0})
+	sphere := CreateModel("Meshes/sphere.obj", "Textures/map.png", "Shaders/basic")
 
+	// To compute frame per second
 	now := time.Now().UnixNano()
-
-	shadowMat := CreateMaterial("Shaders/shadows.vs.glsl", "Shaders/shadows.fs.glsl")
-	_ = shadowMat
 
 	light := CreateLight(mgl32.Vec3{0.5, 2.0, 2.0})
 
@@ -108,7 +75,7 @@ func main() {
 	for !display.window.ShouldClose() && !input.IsKeyDown(ESC) {
 		// Picking stuff
 		if display.window.GetMouseButton(glfw.MouseButtonLeft) == glfw.Press {
-			cubeTransform.SetPosition(input.GetRayPosition(camera, 3.0))
+			monkey.transform.SetPosition(input.GetRayPosition(camera, 3.0))
 		}
 		// Rendering stuff
 		timePerFrame := float64((time.Now().UnixNano() - now)) / 1e+9 // seconde
@@ -120,57 +87,32 @@ func main() {
 		gl.Clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
 
 		camera = UpdateCamera(camera, display.window)
-		mat.Use()
-		mat.UseCamera(camera)
 		// ========================
 		// DIFFUSE
 		// ========================
-		// Bind shader
-		mat.Use()
-		// CUBE
-		// Bind texture
-		gl.ActiveTexture(gl.TEXTURE0)
-		UseTexture(cubeTexture)
+		// Prepare for model rendering
+		monkey.Prepare()
 		// Bind shadow mapping
 		gl.ActiveTexture(gl.TEXTURE1)
 		UseTexture(pipeline.ShadowTexture)
-		// Bind model view
-		mat.UseInputMatrix(cubeTransform.Model, "model")
-		mat.UseInputMatrix(bias, "bias")
-		mat.UseInputInt(0, "cast_shadow")
 		// Bind our light
-		mat.UseLight(light, false)
+		monkey.program.UseLight(light, false)
+		// Bind our camera
+		monkey.program.UseCamera(camera)
 		// Draw our cube mesh
-		cube.Draw()
+		monkey.Draw()
 		// SPHERE
-		// Bind texture
-		gl.ActiveTexture(gl.TEXTURE0)
-		UseTexture(sphereTexture)
+		// Prepare for model rendering
+		sphere.Prepare()
 		// Bind shadow mapping
 		gl.ActiveTexture(gl.TEXTURE1)
 		UseTexture(pipeline.ShadowTexture)
-		// Bind model view
-		mat.UseInputMatrix(sphereTransform.Model, "model")
-		mat.UseInputMatrix(bias, "bias")
-		mat.UseInputInt(0, "cast_shadow")
 		// Bind our light
-		mat.UseLight(light, false)
+		sphere.program.UseLight(light, false)
+		// Bind our camera
+		sphere.program.UseCamera(camera)
 		// Draw our cube mesh
 		sphere.Draw()
-		// // MAP
-		// // Bind texture
-		// gl.ActiveTexture(gl.TEXTURE0)
-		// UseTexture(theMapTexture)
-		// // Bind shadow mapping
-		// gl.ActiveTexture(gl.TEXTURE1)
-		// UseTexture(pipeline.ShadowTexture)
-		// // Bind model view
-		// mat.UseInputMatrix(theMapTransform.Model, "model")
-		// mat.UseInputMatrix(bias, "bias")
-		// mat.UseInputInt(1, "castShadow")
-		// // Bind our light
-		// mat.UseLight(light, false)
-		// theMap.Draw()
 		// TERRAIN
 		terrain.Prepare()
 		terrain.program.UseCamera(camera)
@@ -189,17 +131,14 @@ func main() {
 		// SHADOWS
 		// ========================
 		pipeline.BeginShadow()
-		shadowMat.Use()
-		shadowMat.UseLight(light, true)
-		shadowMat.UseInputMatrix(cubeTransform.Model, "model")
-		cube.Draw()
-		shadowMat.UseInputMatrix(sphereTransform.Model, "model")
+		pipeline.shadowMat.UseLight(light, true)
+		pipeline.shadowMat.UseInputMatrix(monkey.transform.Model, "model")
+		monkey.Draw()
+		pipeline.shadowMat.UseInputMatrix(sphere.transform.Model, "model")
 		sphere.Draw()
-		/*UseInputMatrix(shadowMat, theMapTransform.Model, "model")
-		DrawMesh(theMap)*/
 		pipeline.EndShadow()
 
-		cubeTransform.SetRotation(cubeTransform.Rotation.Add(mgl32.Vec3{0.01, 0.01, 0.01}))
+		monkey.transform.SetRotation(monkey.transform.Rotation.Add(mgl32.Vec3{0.01, 0.01, 0.01}))
 
 		display.window.SwapBuffers()
 		glfw.PollEvents()

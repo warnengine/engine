@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/go-gl/gl/v3.3-core/gl"
+	"github.com/go-gl/gl/v4.2-core/gl"
 	"github.com/go-gl/mathgl/mgl32"
 )
 
@@ -23,7 +23,7 @@ func CreateTerrain(heightMapFile string, diffuseFile string, size float32) Terra
 	heightMap, _, _ := CreateTexture(heightMapFile)
 	diffuse, _, _ := CreateTexture(diffuseFile)
 	// Load shader
-	mat := CreateMaterial("Shaders/terrain.vs.glsl", "Shaders/terrain.fs.glsl")
+	mat := CreateProgram("Shaders/terrain.vs.glsl", "Shaders/terrain.fs.glsl")
 
 	// Simple plane
 	plane := CreateMesh("Meshes/terrain.obj")
@@ -38,7 +38,6 @@ func (terrain *Terrain) Prepare() {
 	terrain.program.Use()
 	// Bind the transform matrices
 	terrain.program.UseInputMatrix(terrain.transform.Model, "model")
-	terrain.transform.GetModelView()
 	// Enable the texture and link it
 	gl.ActiveTexture(gl.TEXTURE0)
 	UseTexture(terrain.diffuse)
