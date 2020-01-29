@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"strconv"
 
-	"github.com/go-gl/gl/v4.2-core/gl"
+	"github.com/go-gl/gl/v3.3-core/gl"
 	"github.com/go-gl/mathgl/mgl32"
 )
 
@@ -169,8 +169,10 @@ func (font *Font) Draw(content string, color Color, position mgl32.Vec2) {
 		font.program.UseInputVec3(mgl32.Vec3{color.red, color.green, color.blue}, "i_color")
 		gl.ActiveTexture(gl.TEXTURE0)
 		UseTexture(font.texture)
+
 		font.program.UseInputVec2(position, "i_position")
 		gl.BindVertexArray(font.letters[string(char)].vao)
 		gl.DrawArrays(gl.TRIANGLES, 0, 9)
+
 	}
 }

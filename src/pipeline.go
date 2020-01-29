@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/go-gl/gl/v4.2-core/gl"
+	"github.com/go-gl/gl/v3.3-core/gl"
 )
 
 // Pipeline regroups diffuse and shadow map and handle the step to render a frame
@@ -105,10 +105,10 @@ func prepareShadows() (uint32, uint32) {
 	gl.TexParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST)
 	gl.TexParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
 	gl.TexParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
-	gl.GenerateMipmap(gl.TEXTURE_2D)
+	// gl.GenerateMipmap(gl.TEXTURE_2D)
 
 	gl.FramebufferTexture(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, depthTexture, 0)
-	gl.DrawBuffer(gl.COLOR_ATTACHMENT0)
+	gl.DrawBuffer(gl.NONE)
 
 	return framebuffer, depthTexture
 }
@@ -119,6 +119,7 @@ func (pipeline *Pipeline) BeginDiffuse() {
 	gl.Viewport(0, 0, int32(pipeline.screen.Width), int32(pipeline.screen.Height))
 
 	gl.Clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
+	gl.CullFace(gl.BACK)
 }
 
 // EndDiffuse draws the diffuse map on screen
@@ -132,6 +133,7 @@ func (pipeline *Pipeline) EndDiffuse() {
 	UseTexture(pipeline.DiffuseTexture)
 	gl.BindVertexArray(pipeline.quadVao)
 	gl.DrawArrays(gl.TRIANGLES, 0, 9)
+
 }
 
 // BeginShadow binds the shadow map for depth rendering
@@ -140,6 +142,7 @@ func (pipeline *Pipeline) BeginShadow() {
 	gl.Viewport(0, 0, 2048, 2048)
 
 	gl.Clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
+	gl.CullFace(gl.FRONT)
 }
 
 // EndShadow does nothing but it's cool to have an end before a begin isn'it ?

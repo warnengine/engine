@@ -7,7 +7,7 @@ import (
 	_ "image/jpeg"
 	_ "image/png"
 
-	"github.com/go-gl/gl/v4.2-core/gl"
+	"github.com/go-gl/gl/v3.3-core/gl"
 )
 
 // Texture represents the add of the stored image.

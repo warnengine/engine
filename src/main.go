@@ -8,7 +8,7 @@ import (
 	"time"
 	"unsafe"
 
-	"github.com/go-gl/gl/v4.2-core/gl"
+	"github.com/go-gl/gl/v3.3-core/gl"
 	"github.com/go-gl/glfw/v3.2/glfw"
 	"github.com/go-gl/mathgl/mgl32"
 )
@@ -27,11 +27,12 @@ func main() {
 	// Increment each new frame
 	var frame int
 
-	screen := Screen{1280, 720}
+	screen := Screen{640, 640}
 	display := createDisplay(screen)
 
 	log.Println("Hello from OpenGL")
 	log.Println(gl.GoStr(gl.GetString(gl.VENDOR)))
+	log.Println(gl.GoStr(gl.GetString(gl.VERSION)))
 	log.Println(gl.GoStr(gl.GetString(gl.RENDERER)))
 
 	pipeline := CreatePipeline(screen)
@@ -60,25 +61,37 @@ func main() {
 	cubeTexture, _, _ := CreateTexture("Textures/abstract.jpg")
 	_ = cubeTexture
 	// Prepare our transform that will describe position/rotation/scale of our object
-	cubeTransform := CreateTransform(mgl32.Vec3{0.0, 1.0, 0.0}, mgl32.Vec3{1.0, 1.0, 1.0}, mgl32.Vec3{1.0, 1.0, 1.0})
-
-	// Init our 3D model "Cube"
-	theMap := CreateMesh("Meshes/map.obj")
-	_ = cube
+	cubeTransform := CreateTransform(mgl32.Vec3{0.0, 1.0, 0.0}, mgl32.Vec3{0.0, 0.0, 0.0}, mgl32.Vec3{1.0, 1.0, 1.0})
+	// /*========================
+	// theMap
+	// ========================*/
+	// // Init our 3D model "Cube"
+	// theMap := CreateMesh("Meshes/map.obj")
+	// _ = cube
+	// // Load our texture
+	// theMapTexture, _, _ := CreateTexture("Textures/map.png")
+	// _ = theMapTexture
+	// // Prepare our transform that will describe position/rotatigeometric intersection testingon/scale of our object
+	// theMapTransform := CreateTransform(mgl32.Vec3{0.0, -1.0, 0.0}, mgl32.Vec3{0.0, 0.0, 0.0}, mgl32.Vec3{1.0, 1.0, 1.0})
+	// // Link it to our shadergeometric intersection testing
+	// mat.Use()
+	// mat.UseInputMatrix(cubeTransform.Model, "model")
+	/*========================
+	sphere
+	========================*/
+	// Init our 3D model "sphere"
+	sphere := CreateMesh("Meshes/sphere.obj")
 	// Load our texture
-	theMapTexture, _, _ := CreateTexture("Textures/map.png")
-	// Prepare our transform that will describe position/rotatigeometric intersection testingon/scale of our object
-	theMapTransform := CreateTransform(mgl32.Vec3{0.0, 0.0, 0.0}, mgl32.Vec3{0.0, 0.0, 0.0}, mgl32.Vec3{1.0, 1.0, 1.0})
-	// Link it to our shadergeometric intersection testing
-	mat.Use()
-	mat.UseInputMatrix(cubeTransform.Model, "model")
+	sphereTexture, _, _ := CreateTexture("Textures/terrain.jpg")
+	// Prepare our transform that will describe position/rotation/scale of our object
+	sphereTransform := CreateTransform(mgl32.Vec3{0.5, 3.0, -3.0}, mgl32.Vec3{0.0, 0.0, 0.0}, mgl32.Vec3{1.0, 1.0, 1.0})
 
 	now := time.Now().UnixNano()
 
 	shadowMat := CreateMaterial("Shaders/shadows.vs.glsl", "Shaders/shadows.fs.glsl")
 	_ = shadowMat
 
-	light := CreateLight(mgl32.Vec3{0.5, 2, 2})
+	light := CreateLight(mgl32.Vec3{0.5, 2.0, 2.0})
 
 	bias := mgl32.Mat4{
 		0.5, 0.0, 0.0, 0.0,
@@ -90,10 +103,12 @@ func main() {
 
 	input := Input{display.window}
 
+	terrain := CreateTerrain("Textures/terrain.jpg", 10)
+
 	for !display.window.ShouldClose() && !input.IsKeyDown(ESC) {
 		// Picking stuff
 		if display.window.GetMouseButton(glfw.MouseButtonLeft) == glfw.Press {
-			cubeTransform.SetPosition(input.GetRayPosition(camera, 1.0))
+			cubeTransform.SetPosition(input.GetRayPosition(camera, 3.0))
 		}
 		// Rendering stuff
 		timePerFrame := float64((time.Now().UnixNano() - now)) / 1e+9 // seconde
@@ -122,25 +137,49 @@ func main() {
 		// Bind model view
 		mat.UseInputMatrix(cubeTransform.Model, "model")
 		mat.UseInputMatrix(bias, "bias")
-		mat.UseInputInt(0, "castShadow")
+		mat.UseInputInt(0, "cast_shadow")
 		// Bind our light
 		mat.UseLight(light, false)
 		// Draw our cube mesh
 		cube.Draw()
-		// MAP
+		// SPHERE
 		// Bind texture
 		gl.ActiveTexture(gl.TEXTURE0)
-		UseTexture(theMapTexture)
+		UseTexture(sphereTexture)
 		// Bind shadow mapping
 		gl.ActiveTexture(gl.TEXTURE1)
 		UseTexture(pipeline.ShadowTexture)
 		// Bind model view
-		mat.UseInputMatrix(theMapTransform.Model, "model")
+		mat.UseInputMatrix(sphereTransform.Model, "model")
 		mat.UseInputMatrix(bias, "bias")
-		mat.UseInputInt(1, "castShadow")
+		mat.UseInputInt(0, "cast_shadow")
 		// Bind our light
 		mat.UseLight(light, false)
-		theMap.Draw()
+		// Draw our cube mesh
+		sphere.Draw()
+		// // MAP
+		// // Bind texture
+		// gl.ActiveTexture(gl.TEXTURE0)
+		// UseTexture(theMapTexture)
+		// // Bind shadow mapping
+		// gl.ActiveTexture(gl.TEXTURE1)
+		// UseTexture(pipeline.ShadowTexture)
+		// // Bind model view
+		// mat.UseInputMatrix(theMapTransform.Model, "model")
+		// mat.UseInputMatrix(bias, "bias")
+		// mat.UseInputInt(1, "castShadow")
+		// // Bind our light
+		// mat.UseLight(light, false)
+		// theMap.Draw()
+		// TERRAIN
+		terrain.Prepare()
+		terrain.program.UseCamera(camera)
+		gl.ActiveTexture(gl.TEXTURE1)
+		UseTexture(pipeline.ShadowTexture)
+		terrain.program.UseInputInt(1, "castShadow")
+		terrain.program.UseInputMatrix(bias, "bias")
+		terrain.program.UseLight(light, false)
+		terrain.Draw()
 		// A bit of text rendering
 		dejaVuSans.Draw(fmt.Sprintf("%d", int32(math.Ceil(1/timePerFrame)))+"fps", Color{0.2, 0.8, 0.2}, mgl32.Vec2{0.0, 0.0})
 		form.Draw()
@@ -154,6 +193,8 @@ func main() {
 		shadowMat.UseLight(light, true)
 		shadowMat.UseInputMatrix(cubeTransform.Model, "model")
 		cube.Draw()
+		shadowMat.UseInputMatrix(sphereTransform.Model, "model")
+		sphere.Draw()
 		/*UseInputMatrix(shadowMat, theMapTransform.Model, "model")
 		DrawMesh(theMap)*/
 		pipeline.EndShadow()

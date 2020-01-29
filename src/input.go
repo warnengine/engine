@@ -38,7 +38,8 @@ func (input *Input) GetRayPosition(camera Camera, groundHeight float32) mgl32.Ve
 	ray := mgl32.Vec3{rayWor.X(), rayWor.Y(), rayWor.Z()}.Normalize()
 	ip := intersectPoint(ray, camera.Position.Add(mgl32.Vec3{3 + float32(camera.Distance), 3 + float32(camera.Distance), 3 + float32(camera.Distance)}), mgl32.Vec3{0, 1, 0}, mgl32.Vec3{0, 0, 0})
 
-	return ip
+	return mgl32.Vec3{ip.X(), groundHeight, ip.Z()}
+	// return ip
 }
 
 // IsKeyDown check if user is currently pressing a key
