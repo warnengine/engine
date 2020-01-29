@@ -1,6 +1,9 @@
 package main
 
 import (
+	"log"
+	"time"
+
 	"github.com/go-gl/gl/v4.2-core/gl"
 )
 
@@ -12,6 +15,8 @@ type Mesh struct {
 
 // CreateMesh loads a .obj file
 func CreateMesh(obj string) Mesh {
+	log.Printf("-> Loading %s", obj)
+	start := time.Now()
 	// Load model
 	vertices, uvs, normals := LoadModel(obj)
 
@@ -20,7 +25,6 @@ func CreateMesh(obj string) Mesh {
 	gl.GenBuffers(1, &vbo)
 	gl.BindBuffer(gl.ARRAY_BUFFER, vbo)
 	gl.BufferData(gl.ARRAY_BUFFER, len(vertices)*4, gl.Ptr(vertices), gl.STATIC_DRAW)
-	
 
 	// Vertex Array Buffer -> vertices
 	var vao uint32
@@ -29,7 +33,6 @@ func CreateMesh(obj string) Mesh {
 	gl.EnableVertexAttribArray(0)
 	gl.BindBuffer(gl.ARRAY_BUFFER, vbo)
 	gl.VertexAttribPointer(0, 3, gl.FLOAT, false, 0, nil)
-	
 
 	// Vertex Array Buffer -> uvs
 	var uvsBuffer uint32
@@ -39,7 +42,6 @@ func CreateMesh(obj string) Mesh {
 	gl.EnableVertexAttribArray(1)
 	gl.BindBuffer(gl.ARRAY_BUFFER, uvsBuffer)
 	gl.VertexAttribPointer(1, 2, gl.FLOAT, false, 0, nil)
-	
 
 	// Vertex Array Buffer -> normals
 	var normalsBuffer uint32
@@ -49,7 +51,9 @@ func CreateMesh(obj string) Mesh {
 	gl.EnableVertexAttribArray(2)
 	gl.BindBuffer(gl.ARRAY_BUFFER, normalsBuffer)
 	gl.VertexAttribPointer(2, 3, gl.FLOAT, false, 0, nil)
-	
+
+	elapsed := time.Now().Sub(start)
+	log.Printf("-> End of loading %f", elapsed.Seconds())
 
 	return Mesh{vao, int32(len(vertices))}
 }
@@ -60,5 +64,4 @@ func (mesh *Mesh) Draw() {
 	gl.BindVertexArray(mesh.Vao)
 	// Finally draw
 	gl.DrawArrays(gl.TRIANGLES, 0, mesh.Length)
-	
 }

@@ -17,11 +17,21 @@ const (
 	T
 	H
 	ESC
+	UP
+	DOWN
+	LEFT
+	RIGHT
 )
 
 // Input allows high level input testing
 type Input struct {
 	window *glfw.Window
+	scroll mgl32.Vec2
+}
+
+func CreateInput(display Display) Input {
+	display.window.SetScrollCallback(scrollCallback)
+	return Input{display.window, mgl32.Vec2{0.0, 0.0}}
 }
 
 // GetRayPosition compute the position pointed by the mouse position on a infinite plane
@@ -59,9 +69,23 @@ func (input *Input) IsKeyDown(keyCode KeyCode) bool {
 		return input.window.GetKey(glfw.KeyH) == glfw.Press
 	case ESC:
 		return input.window.GetKey(glfw.KeyEscape) == glfw.Press
+	case UP:
+		return input.window.GetKey(glfw.KeyUp) == glfw.Press
+	case DOWN:
+		return input.window.GetKey(glfw.KeyDown) == glfw.Press
+	case LEFT:
+		return input.window.GetKey(glfw.KeyLeft) == glfw.Press
+	case RIGHT:
+		return input.window.GetKey(glfw.KeyRight) == glfw.Press
 	default:
 		return false
 	}
+}
+
+func (input *Input) Update() {
+	// Okay the user has STOPPED scroll
+	// But bon't stop it too sharply
+	input.scroll = mgl32.Vec2{input.scroll.X() * 0.8, input.scroll.Y() * 0.8}
 }
 
 func intersectPoint(rayVector mgl32.Vec3, rayPoint mgl32.Vec3, planeNormal mgl32.Vec3, planePoint mgl32.Vec3) mgl32.Vec3 {
@@ -70,4 +94,8 @@ func intersectPoint(rayVector mgl32.Vec3, rayPoint mgl32.Vec3, planeNormal mgl32
 	prod2 := rayVector.Dot(planeNormal)
 	prod3 := prod1 / prod2
 	return rayPoint.Sub(rayVector.Mul(prod3))
+}
+
+func scrollCallback(window *glfw.Window, xoffset float64, yoffset float64) {
+	input.scroll = mgl32.Vec2{float32(xoffset), float32(yoffset)}
 }

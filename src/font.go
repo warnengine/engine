@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"log"
 	"strconv"
 
 	"github.com/go-gl/gl/v4.2-core/gl"
@@ -31,6 +32,7 @@ type Char struct {
 
 // CreateFont loads from settings files all textures and informations to draw letters/
 func CreateFont(textureFile string, configFile string, size int, screen Screen) Font {
+	log.Printf("Loading Font:")
 	// Load texture
 	texture, textSizeX, textSizeY := CreateTexture(textureFile)
 	// Load shader

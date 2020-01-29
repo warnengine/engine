@@ -1,12 +1,9 @@
 package main
 
 import (
-	"fmt"
 	"log"
-	"math"
 	"runtime"
 	"time"
-	"unsafe"
 
 	"github.com/go-gl/gl/v4.2-core/gl"
 	"github.com/go-gl/glfw/v3.2/glfw"
@@ -18,6 +15,7 @@ func init() {
 }
 
 var dejaVuSans Font
+var input Input
 
 func main() {
 	// Init our file system
@@ -35,7 +33,7 @@ func main() {
 	log.Println(gl.GoStr(gl.GetString(gl.VERSION)))
 	log.Println(gl.GoStr(gl.GetString(gl.RENDERER)))
 
-	pipeline := CreatePipeline(screen)
+	// pipeline := CreatePipeline(screen)
 
 	// HERE STARTS THE GOOD STUFF
 	dejaVuSans := CreateFont("Fonts/DejaVuSans.png", "Fonts/DejaVuSans.fnt", 64, screen)
@@ -44,45 +42,47 @@ func main() {
 	form := CreateForm(display.window, dejaVuSans, screen)
 	form.AddButton(CreateDefaultButton("CLICK ME", mgl32.Vec2{1, -1}))
 
-	camera := CreateCamera(mgl32.Vec3{0, 3, 0}, display.window, int32(screen.Width), int32(screen.Height))
-	display.window.SetUserPointer(unsafe.Pointer(&camera))
-	/*========================
-	Monkey
-	========================*/
-	monkey := CreateModel("Meshes/monkey.obj", "Textures/abstract.jpg", "Shaders/basic")
-	/*========================
-	Sphere
-	========================*/
-	sphere := CreateModel("Meshes/sphere.obj", "Textures/map.png", "Shaders/basic")
+	// camera := CreateCamera(mgl32.Vec3{0, 3, 0}, display.window, int32(screen.Width), int32(screen.Height))
+
+	scene1 := CreateScene(screen, &display)
+	scene1.Register(ModelDefinition{"Meshes/monkey.obj", "Textures/abstract.jpg", "Shaders/basic", false, true})
+	scene1.Register(ModelDefinition{"Meshes/sphere.obj", "Textures/map.png", "Shaders/basic", false, true})
+	scene1.Register(ModelDefinition{"Meshes/terrain.obj", "Textures/terrainDiffuse.jpg", "Shaders/basic", true, false})
+	scene1.Load()
+	scene1.Activate(&display)
 
 	// To compute frame per second
 	now := time.Now().UnixNano()
 
-	light := CreateLight(mgl32.Vec3{0.5, 2.0, 2.0})
+	// light := CreateLight(mgl32.Vec3{0.5, 2.0, 2.0})
 
 	bias := mgl32.Mat4{
 		0.5, 0.0, 0.0, 0.0,
 		0.0, 0.5, 0.0, 0.0,
 		0.0, 0.0, 0.5, 0.0,
 		0.5, 0.5, 0.5, 1.0}
+	_ = bias
 
 	gl.ClearColor(0.51, 0.51, 0.8, 1.0)
 
-	input := Input{display.window}
+	input = CreateInput(display)
 
-	terrain := CreateTerrain("Textures/terrainHeight.jpg", "Textures/terrainDiffuse.jpg", 10)
+	// terrain := CreateTerrain("Textures/terrainHeight.jpg", "Textures/terrainDiffuse.jpg", 10)
+	// _ = terrain
 
 	for !display.window.ShouldClose() && !input.IsKeyDown(ESC) {
 		// Picking stuff
-		if display.window.GetMouseButton(glfw.MouseButtonLeft) == glfw.Press {
-			monkey.transform.SetPosition(input.GetRayPosition(camera, 3.0))
-		}
+		// if display.window.GetMouseButton(glfw.MouseButtonLeft) == glfw.Press {
+		//	monkey.transform.SetPosition(input.GetRayPosition(camera, 3.0))
+		// }
 		// Rendering stuff
 		timePerFrame := float64((time.Now().UnixNano() - now)) / 1e+9 // seconde
 		_ = timePerFrame
 		now = time.Now().UnixNano()
 
-		pipeline.BeginDiffuse()
+		scene1.Draw()
+
+		/*pipeline.BeginDiffuse()
 		// Draw stuff
 		gl.Clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
 
@@ -130,15 +130,17 @@ func main() {
 		// ========================
 		// SHADOWS
 		// ========================
-		pipeline.BeginShadow()
+		/*pipeline.BeginShadow()
 		pipeline.shadowMat.UseLight(light, true)
 		pipeline.shadowMat.UseInputMatrix(monkey.transform.Model, "model")
 		monkey.Draw()
 		pipeline.shadowMat.UseInputMatrix(sphere.transform.Model, "model")
 		sphere.Draw()
-		pipeline.EndShadow()
+		pipeline.EndShadow()*/
 
-		monkey.transform.SetRotation(monkey.transform.Rotation.Add(mgl32.Vec3{0.01, 0.01, 0.01}))
+		// monkey.transform.SetRotation(monkey.transform.Rotation.Add(mgl32.Vec3{0.01, 0.01, 0.01}))
+
+		form.Draw()
 
 		display.window.SwapBuffers()
 		glfw.PollEvents()

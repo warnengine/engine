@@ -1,6 +1,8 @@
 package main
 
 import (
+	"log"
+
 	"github.com/go-gl/gl/v4.2-core/gl"
 )
 
@@ -18,7 +20,7 @@ type Pipeline struct {
 
 // CreatePipeline creates a pipeline (creates and binds opengl textures)
 func CreatePipeline(screen Screen) Pipeline {
-
+	log.Printf("Loading Pipeline:")
 	frameBufferDiffuse, diffuseTexture := prepareDiffuse(screen)
 	frameBufferShadows, depthTexture := prepareShadows()
 	// RECT TO FIT THE SCREEN

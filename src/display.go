@@ -49,13 +49,13 @@ func createDisplay(screen Screen) Display {
 
 	gl.DebugMessageCallback(gl.DebugProc(ogldebugcb), gl.Ptr(nil))
 
-	gl.DebugMessageInsert(
-		gl.DEBUG_SOURCE_APPLICATION,
-		gl.DEBUG_TYPE_ERROR,
-		1, // Id
-		gl.DEBUG_SEVERITY_NOTIFICATION,
-		-1, // Length (negative => null-terminated)
-		gl.Str("hello world\x00"))
+	/*gl.DebugMessageInsert(
+	gl.DEBUG_SOURCE_APPLICATION,
+	gl.DEBUG_TYPE_ERROR,
+	1, // Id
+	gl.DEBUG_SEVERITY_NOTIFICATION,
+	-1, // Length (negative => null-terminated)
+	gl.Str("hello world\x00"))*/
 
 	return Display{
 		window: window,

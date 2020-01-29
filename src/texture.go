@@ -6,6 +6,8 @@ import (
 	"image/draw"
 	_ "image/jpeg"
 	_ "image/png"
+	"log"
+	"time"
 
 	"github.com/go-gl/gl/v4.2-core/gl"
 )
@@ -15,12 +17,9 @@ type Texture = uint32
 
 // CreateTexture loads and stores an image and returns its address and dimension.
 func CreateTexture(file string) (Texture, int, int) {
+	start := time.Now()
 	// Open file
-	/*imgFile, err := os.Open(file)
-	if err != nil {
-		panic(err)
-	}*/
-
+	log.Printf("-> Loading %s", file)
 	// Decode image
 	img, _, err := image.Decode(bytes.NewReader(ReadFile(file)))
 	if err != nil {
@@ -52,6 +51,9 @@ func CreateTexture(file string) (Texture, int, int) {
 		gl.RGBA,
 		gl.UNSIGNED_BYTE,
 		gl.Ptr(rgba.Pix))
+
+	elapsed := time.Now().Sub(start)
+	log.Printf("-> End of loading %f", elapsed.Seconds())
 
 	return texture, rgba.Rect.Size().X, rgba.Rect.Size().Y
 }

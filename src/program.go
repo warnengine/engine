@@ -2,7 +2,9 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"strings"
+	"time"
 
 	"github.com/go-gl/gl/v4.2-core/gl"
 	"github.com/go-gl/mathgl/mgl32"
@@ -41,7 +43,6 @@ func CreateProgram(vertexShaderPath string, fragmentShaderPath string) Program {
 // Use tells the rendering API to use a specific material (shaders by-the-way).
 func (program *Program) Use() {
 	gl.UseProgram(program.glProgram)
-
 }
 
 // UseInputMatrix links a 4x4 matrix to the material
@@ -56,7 +57,6 @@ func (program *Program) UseInputVec3(vec mgl32.Vec3, inputName string) {
 	inputID := gl.GetUniformLocation(program.glProgram, gl.Str(inputName+"\x00"))
 	checkInputID(inputID, inputName)
 	gl.Uniform3fv(inputID, 1, &vec[0])
-
 }
 
 // UseInputVec2 links a vec2 to the material
@@ -91,6 +91,8 @@ func checkInputID(inputID int32, inputName string) {
 
 // compileShader compiles shaders and return a program. Credit: https://github.com/go-gl/example/blob/master/gl41core-cube/cube.go
 func compileShader(source string, shaderType uint32, shaderName string) (uint32, error) {
+	start := time.Now()
+	log.Printf("-> Compiling %s", shaderName)
 	shader := gl.CreateShader(shaderType)
 
 	csources, free := gl.Strs(source + "\x00")
@@ -110,5 +112,7 @@ func compileShader(source string, shaderType uint32, shaderName string) (uint32,
 		return 0, fmt.Errorf("Failed to compile %v\n%v\n%v", shaderName, source, log)
 	}
 
+	elapsed := time.Now().Sub(start)
+	log.Printf("-> End of compiling %f", elapsed.Seconds())
 	return shader, nil
 }
