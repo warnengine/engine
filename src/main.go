@@ -27,7 +27,7 @@ func main() {
 	// Increment each new frame
 	var frame int
 
-	screen := Screen{640, 640}
+	screen := Screen{1280, 720}
 	display := createDisplay(screen)
 
 	log.Println("Hello from OpenGL")
@@ -103,7 +103,7 @@ func main() {
 
 	input := Input{display.window}
 
-	terrain := CreateTerrain("Textures/terrain.jpg", 10)
+	terrain := CreateTerrain("Textures/terrainHeight.jpg", "Textures/terrainDiffuse.jpg", 10)
 
 	for !display.window.ShouldClose() && !input.IsKeyDown(ESC) {
 		// Picking stuff
