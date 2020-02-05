@@ -1,10 +1,12 @@
 package main
 
 import (
-	"github.com/go-gl/gl/v4.2-core/gl"
+	"github.com/go-gl/gl/v3.3-core/gl"
 	"github.com/go-gl/mathgl/mgl32"
 )
 
+// Model is a group composed by a shader, a mesh and a texture.
+// Model is drawable.
 type Model struct {
 	mesh       Mesh
 	texture    Texture

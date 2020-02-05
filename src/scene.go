@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/go-gl/gl/v4.2-core/gl"
+	"github.com/go-gl/gl/v3.3-core/gl"
 
 	"github.com/go-gl/mathgl/mgl32"
 )
@@ -17,17 +17,19 @@ type Scene struct {
 	camera   Camera
 	defs     []ModelDefinition
 	models   []Model
+	terrain  Terrain
 }
 
-// CreateScene creates an empty scene.
-func CreateScene(screen Screen, display *Display) Scene {
+// CreateScene creates an empty scene from a given terrain definition.
+func CreateScene(terrain TerrainDefinition, screen Screen, display *Display) Scene {
 	return Scene{
 		false,
 		CreatePipeline(screen),
 		CreateLight(mgl32.Vec3{0.5, 2.0, 2.0}),
 		CreateCamera(mgl32.Vec3{0, 3, 0}, display.window, int32(screen.Width), int32(screen.Height)),
 		[]ModelDefinition{},
-		[]Model{}}
+		[]Model{},
+		CreateTerrain(terrain.heightMapFile, terrain.diffuseFile, terrain.size)}
 }
 
 // Activate makes the scene the current scene
@@ -53,6 +55,7 @@ func (scene *Scene) Load() {
 
 // Draw calls the rendering api to draw all instance of model
 func (scene *Scene) Draw() {
+	// Play with 
 	// First update our little camera
 	scene.camera.Update()
 	// Update our input
@@ -68,6 +71,16 @@ func (scene *Scene) Draw() {
 		scene.Load()
 	}
 	scene.pipeline.BeginDiffuse()
+	// Draw the terrain linked to this scene
+	scene.terrain.Prepare()
+	scene.terrain.program.UseCamera(scene.camera)
+	gl.ActiveTexture(gl.TEXTURE1)
+	UseTexture(scene.pipeline.ShadowTexture)
+	scene.terrain.program.UseInputInt(1, "castShadow")
+	scene.terrain.program.UseInputMatrix(bias, "bias")
+	scene.terrain.program.UseLight(scene.light, false)
+	scene.terrain.Draw()
+
 	for _, model := range scene.models {
 		// Prepare for model rendering
 		model.Prepare()
@@ -90,7 +103,6 @@ func (scene *Scene) Draw() {
 		model.Draw()
 	}
 	scene.pipeline.EndDiffuse()
-
 	scene.pipeline.BeginShadow()
 	for _, model := range scene.models {
 		if model.genShadow {

@@ -3,7 +3,7 @@ package main
 import (
 	"log"
 
-	"github.com/go-gl/gl/v4.2-core/gl"
+	"github.com/go-gl/gl/v3.3-core/gl"
 )
 
 // Pipeline regroups diffuse and shadow map and handle the step to render a frame

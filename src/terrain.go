@@ -1,17 +1,24 @@
 package main
 
 import (
-	"github.com/go-gl/gl/v4.2-core/gl"
+	"github.com/go-gl/gl/v3.3-core/gl"
 	"github.com/go-gl/mathgl/mgl32"
 )
 
-// Terrain is a plane modified by a texture
+// Terrain is a plane modified by a texture.
 type Terrain struct {
 	mesh      Mesh
 	program   Program
 	heightMap Texture
 	diffuse   Texture
 	transform Transform
+}
+
+// TerrainDefinition is a terrain that hasn't been loaded yet.
+type TerrainDefinition struct {
+	heightMapFile string
+	diffuseFile   string
+	size          float32
 }
 
 // CreateTerrain creates terrain from a texture with a given side size.

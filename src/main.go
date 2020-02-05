@@ -5,7 +5,7 @@ import (
 	"runtime"
 	"time"
 
-	"github.com/go-gl/gl/v4.2-core/gl"
+	"github.com/go-gl/gl/v3.3-core/gl"
 	"github.com/go-gl/glfw/v3.2/glfw"
 	"github.com/go-gl/mathgl/mgl32"
 )
@@ -44,10 +44,10 @@ func main() {
 
 	// camera := CreateCamera(mgl32.Vec3{0, 3, 0}, display.window, int32(screen.Width), int32(screen.Height))
 
-	scene1 := CreateScene(screen, &display)
+	scene1 := CreateScene(TerrainDefinition{"Textures/terrainHeight.jpg", "Textures/terrainDiffuse.jpg", 10}, screen, &display)
 	scene1.Register(ModelDefinition{"Meshes/monkey.obj", "Textures/abstract.jpg", "Shaders/basic", false, true})
 	scene1.Register(ModelDefinition{"Meshes/sphere.obj", "Textures/map.png", "Shaders/basic", false, true})
-	scene1.Register(ModelDefinition{"Meshes/terrain.obj", "Textures/terrainDiffuse.jpg", "Shaders/basic", true, false})
+	// scene1.Register(ModelDefinition{"Meshes/terrain.obj", "Textures/terrainDiffuse.jpg", "Shaders/basic", true, false})
 	scene1.Load()
 	scene1.Activate(&display)
 
@@ -72,9 +72,9 @@ func main() {
 
 	for !display.window.ShouldClose() && !input.IsKeyDown(ESC) {
 		// Picking stuff
-		// if display.window.GetMouseButton(glfw.MouseButtonLeft) == glfw.Press {
-		//	monkey.transform.SetPosition(input.GetRayPosition(camera, 3.0))
-		// }
+		if display.window.GetMouseButton(glfw.MouseButtonLeft) == glfw.Press {
+			scene1.models[0].transform.SetPosition(input.GetRayPosition(scene1.camera, 3.0))
+		}
 		// Rendering stuff
 		timePerFrame := float64((time.Now().UnixNano() - now)) / 1e+9 // seconde
 		_ = timePerFrame

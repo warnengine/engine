@@ -6,7 +6,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/go-gl/gl/v4.2-core/gl"
+	"github.com/go-gl/gl/v3.3-core/gl"
 	"github.com/go-gl/mathgl/mgl32"
 )
 
@@ -15,7 +15,7 @@ type Program struct {
 	glProgram uint32
 }
 
-// CreateMaterial loads and compiles shaders and returns the prepared Material/
+// CreateProgram loads and compiles shaders and returns the prepared Material.
 func CreateProgram(vertexShaderPath string, fragmentShaderPath string) Program {
 	// Load source code of the vertex shader
 	vertexShaderSource := ReadFile(vertexShaderPath)

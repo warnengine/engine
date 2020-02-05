@@ -29,12 +29,13 @@ type Input struct {
 	scroll mgl32.Vec2
 }
 
+// CreateInput loads key input callbacks from windowing api.
 func CreateInput(display Display) Input {
 	display.window.SetScrollCallback(scrollCallback)
 	return Input{display.window, mgl32.Vec2{0.0, 0.0}}
 }
 
-// GetRayPosition compute the position pointed by the mouse position on a infinite plane
+// GetRayPosition compute the position pointed by the mouse position on a infinite plane.
 func (input *Input) GetRayPosition(camera Camera, groundHeight float32) mgl32.Vec3 {
 	mouseX, mouseY := input.window.GetCursorPos()
 	x := (2.0*mouseX)/float64(camera.Width) - 1.0
@@ -82,6 +83,7 @@ func (input *Input) IsKeyDown(keyCode KeyCode) bool {
 	}
 }
 
+// Update calls the windowing api to update key input const.
 func (input *Input) Update() {
 	// Okay the user has STOPPED scroll
 	// But bon't stop it too sharply

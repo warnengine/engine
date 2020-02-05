@@ -5,16 +5,16 @@ install-linux:
 	go get github.com/go-gl/mathgl/mgl32
 	go get github.com/DeedleFake/Go-PhysicsFS/physfs
 	go get github.com/go-gl/glfw/v3.2/glfw
-	go get github.com/go-gl/gl/v4.2-core/gl
+	go get github.com/go-gl/gl/v3.3-core/gl
 	go get github.com/sheenobu/go-obj/obj
 	
 linux:
 	@echo Compiling Engine data
-	cd ../Data && zip -r -q public.zip *
+	cd ../data && zip -r -q public.zip *
 	@echo Compiling Engine source
 	GOARCH=amd64 go build -tags gldebug -o build/Warnengine src/*.go
 	@echo Launching app
-	./build/Warnengine ../Data/public.zip
+	./build/Warnengine ../data/public.zip
 
 win:
 	@echo Compiling Engine source
