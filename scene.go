@@ -9,12 +9,13 @@ import (
 	"github.com/go-gl/mathgl/mgl32"
 )
 
-// Scene is a group of models
+// Scene is a group of nodes.
 type Scene struct {
 	loaded   bool
 	pipeline Pipeline
 	light    Light
 	camera   Camera
+	nodes    []interface{}
 	defs     []ModelDefinition
 	models   []Model
 	terrain  Terrain
@@ -27,6 +28,7 @@ func CreateScene(terrain TerrainDefinition, screen Screen, display *Display) Sce
 		CreatePipeline(screen),
 		CreateLight(mgl32.Vec3{0.5, 2.0, 2.0}),
 		CreateCamera(mgl32.Vec3{0, 3, 0}, display.window, int32(screen.Width), int32(screen.Height)),
+		[]interface{},
 		[]ModelDefinition{},
 		[]Model{},
 		CreateTerrain(terrain.heightMapFile, terrain.diffuseFile, terrain.size)}

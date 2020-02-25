@@ -38,7 +38,7 @@ func createDisplay(screen Screen) Display {
 	}
 
 	// V-sync please
-	glfw.SwapInterval(0)
+	glfw.SwapInterval(1)
 
 	// Some OpenGL tweaks
 	gl.Enable(gl.DEPTH_TEST)

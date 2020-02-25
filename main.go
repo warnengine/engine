@@ -82,63 +82,7 @@ func main() {
 
 		scene1.Draw()
 
-		/*pipeline.BeginDiffuse()
-		// Draw stuff
-		gl.Clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
-
-		camera = UpdateCamera(camera, display.window)
-		// ========================
-		// DIFFUSE
-		// ========================
-		// Prepare for model rendering
-		monkey.Prepare()
-		// Bind shadow mapping
-		gl.ActiveTexture(gl.TEXTURE1)
-		UseTexture(pipeline.ShadowTexture)
-		// Bind our light
-		monkey.program.UseLight(light, false)
-		// Bind our camera
-		monkey.program.UseCamera(camera)
-		// Draw our cube mesh
-		monkey.Draw()
-		// SPHERE
-		// Prepare for model rendering
-		sphere.Prepare()
-		// Bind shadow mapping
-		gl.ActiveTexture(gl.TEXTURE1)
-		UseTexture(pipeline.ShadowTexture)
-		// Bind our light
-		sphere.program.UseLight(light, false)
-		// Bind our camera
-		sphere.program.UseCamera(camera)
-		// Draw our cube mesh
-		sphere.Draw()
-		// TERRAIN
-		terrain.Prepare()
-		terrain.program.UseCamera(camera)
-		gl.ActiveTexture(gl.TEXTURE1)
-		UseTexture(pipeline.ShadowTexture)
-		terrain.program.UseInputInt(1, "castShadow")
-		terrain.program.UseInputMatrix(bias, "bias")
-		terrain.program.UseLight(light, false)
-		terrain.Draw()
-		// A bit of text rendering
-		dejaVuSans.Draw(fmt.Sprintf("%d", int32(math.Ceil(1/timePerFrame)))+"fps", Color{0.2, 0.8, 0.2}, mgl32.Vec2{0.0, 0.0})
-		form.Draw()
-		// End for color rendering
-		pipeline.EndDiffuse()
-		// ========================
-		// SHADOWS
-		// ========================
-		/*pipeline.BeginShadow()
-		pipeline.shadowMat.UseLight(light, true)
-		pipeline.shadowMat.UseInputMatrix(monkey.transform.Model, "model")
-		monkey.Draw()
-		pipeline.shadowMat.UseInputMatrix(sphere.transform.Model, "model")
-		sphere.Draw()
-		pipeline.EndShadow()*/
-
-		// monkey.transform.SetRotation(monkey.transform.Rotation.Add(mgl32.Vec3{0.01, 0.01, 0.01}))
+		input.Update()
 
 		form.Draw()
 
@@ -146,7 +90,6 @@ func main() {
 		glfw.PollEvents()
 		// Statistics stuff
 		frame++
-
 	}
 	display.StopDisplay()
 }
